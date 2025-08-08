@@ -1,103 +1,145 @@
-import Image from "next/image";
+'use server';
 
-export default function Home() {
+import getStandings, { getStandingsFiltered } from "./action";
+
+function teamAccent(team: string): string {
+  const map: Record<string, string> = {
+    'Red Bull Racing': 'from-blue-700 to-indigo-600',
+    Mercedes: 'from-emerald-400 to-teal-500',
+    Ferrari: 'from-red-600 to-rose-600',
+    McLaren: 'from-amber-400 to-orange-500',
+    'Aston Martin': 'from-emerald-600 to-green-700',
+    Alpine: 'from-sky-600 to-indigo-600',
+    Williams: 'from-blue-500 to-sky-600',
+    AlphaTauri: 'from-slate-600 to-slate-800',
+    'Alfa Romeo': 'from-rose-500 to-rose-700',
+    'Haas F1 Team': 'from-neutral-500 to-neutral-700',
+  };
+  return map[team] ?? 'from-zinc-600 to-zinc-800';
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
+  // Support query param filtering: /?excludeTeams=McLaren,Red%20Bull
+  const excludeTeamsParam = (await searchParams)?.excludeTeams;
+  const excludeTeams = Array.isArray(excludeTeamsParam)
+    ? excludeTeamsParam
+    : excludeTeamsParam
+    ? String(excludeTeamsParam)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+
+  const standings = excludeTeams.length
+    ? await getStandingsFiltered({ excludeTeams })
+    : await getStandings();
+  const topThree = standings.slice(0, 3);
+  const rest = standings.slice(3);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Top nav */}
+      <header className="sticky top-0 z-10 bg-neutral-950/80 backdrop-blur border-b border-white/10">
+        <div className="container mx-auto px-4 py-3">
+          <nav className="flex items-center gap-6">
+            <a
+              href="/"
+              className={`font-semibold tracking-tight text-sm transition-colors ${
+                excludeTeams.length ? "text-neutral-300 hover:text-white" : "text-white"
+              }`}
+            >
+              F1.5
+            </a>
+            <a
+              href="/?excludeTeams=McLaren"
+              className={`font-semibold tracking-tight text-sm transition-colors ${
+                excludeTeams.length ? "text-white" : "text-neutral-300 hover:text-white"
+              }`}
+            >
+              Without McLaren
+            </a>
+          </nav>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </header>
+      <section className="container mx-auto px-4 py-14">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{excludeTeams.length ? "Without McLaren Standings" : "Formula 1.5 Standings"}</h1>
+      </section>
+
+      {/* Podium */}
+      <section className="container mx-auto px-4 mt-4 md:mt-2 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end">
+          {topThree.map((d, idx) => {
+            const order = idx === 0 ? 'sm:order-2' : idx === 1 ? 'sm:order-1' : 'sm:order-3';
+            const height = idx === 0 ? 'h-64 md:h-72' : idx === 1 ? 'h-56 md:h-64' : 'h-52 md:h-60';
+            const titleSize = idx === 0 ? 'text-3xl' : 'text-2xl';
+            return (
+              <div key={d.position} className={`${order}`}>
+                <div className={`relative rounded-2xl p-6 border border-white/10 bg-gradient-to-br ${teamAccent(d.team)} shadow-xl overflow-hidden`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-xs uppercase tracking-widest text-white/80">Position</div>
+                      <div className="text-5xl font-extrabold leading-none">{d.position}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-white/80">Points</div>
+                      <div className="text-4xl font-extrabold">{d.points}</div>
+                    </div>
+                  </div>
+                  <div className={`mt-5 ${height} flex items-end`}>
+                    <div className="w-full rounded-xl bg-black/20 backdrop-blur-sm p-5 border border-white/10">
+                      <div className={`${titleSize} font-bold truncate`}>{d.driver}</div>
+                      <div className="text-sm text-white/85 truncate">{d.team} • {d.nationality}</div>
+                      <div className="mt-4 flex gap-3 text-xs text-white/90">
+                        <span className="px-2 py-1 rounded-md bg-white/15 border border-white/10">Wins {d.wins}</span>
+                        <span className="px-2 py-1 rounded-md bg-white/15 border border-white/10">Sprint Wins {d.sprintWins}</span>
+                        <span className="px-2 py-1 rounded-md bg-white/15 border border-white/10">Podiums {d.podiums}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Table */}
+      <section className="container mx-auto px-4 mb-16">
+        <div className="overflow-x-auto rounded-2xl border border-white/10 bg-neutral-900/40">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="text-left text-white/80 border-b border-white/10">
+                <th className="px-5 py-4 font-medium">Pos</th>
+                <th className="px-5 py-4 font-medium">Driver</th>
+                <th className="px-5 py-4 font-medium">Team</th>
+                <th className="px-5 py-4 font-medium text-right hidden md:table-cell">Wins</th>
+                <th className="px-5 py-4 font-medium text-right hidden lg:table-cell">Sprint Wins</th>
+                <th className="px-5 py-4 font-medium text-right hidden md:table-cell">Podiums</th>
+                <th className="px-5 py-4 font-medium text-right">Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rest.map((d) => (
+                <tr key={d.position} className="border-t border-white/10 hover:bg-white/[0.05]">
+                  <td className="px-5 py-4 font-semibold">{d.position}</td>
+                  <td className="px-5 py-4">{d.driver}</td>
+                  <td className="px-5 py-4">
+                    <span className={`inline-block text-xs px-2 py-1 rounded-md bg-gradient-to-r ${teamAccent(d.team)} border border-white/10`}>{d.team}</span>
+                  </td>
+                  <td className="px-5 py-4 text-right hidden md:table-cell">{d.wins}</td>
+                  <td className="px-5 py-4 text-right hidden lg:table-cell">{d.sprintWins}</td>
+                  <td className="px-5 py-4 text-right hidden md:table-cell">{d.podiums}</td>
+                  <td className="px-5 py-4 text-right font-bold">{d.points}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }
