@@ -38,7 +38,7 @@ export default async function Home({
 
   const standings = excludeTeams.length
     ? await getStandingsFiltered({ excludeTeams })
-    : await getStandings();
+    : await getStandings({ excludeDriverNumbers: [1, 4, 12, 16, 44, 63, 81] });
   const topThree = standings.slice(0, 3);
   const rest = standings.slice(3);
 
