@@ -11,7 +11,6 @@ import "dotenv/config";
 import { db } from "../db/index.js";
 import { sessions, sessionResults } from "../db/schema.js";
 import { fetchJson } from "../lib/http.js";
-import { eq } from "drizzle-orm";
 
 type F1SessionResult = {
   position: number;

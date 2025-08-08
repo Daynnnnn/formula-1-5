@@ -1,5 +1,6 @@
 'use server';
 
+import Link from "next/link";
 import getStandings, { getStandingsFiltered } from "./action";
 
 function teamAccent(team: string): string {
@@ -21,10 +22,11 @@ function teamAccent(team: string): string {
 export default async function Home({
   searchParams,
 }: {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   // Support query param filtering: /?excludeTeams=McLaren,Red%20Bull
-  const excludeTeamsParam = (await searchParams)?.excludeTeams;
+  const params = (await searchParams) ?? {};
+  const excludeTeamsParam = params.excludeTeams;
   const excludeTeams = Array.isArray(excludeTeamsParam)
     ? excludeTeamsParam
     : excludeTeamsParam
@@ -46,22 +48,22 @@ export default async function Home({
       <header className="sticky top-0 z-10 bg-neutral-950/80 backdrop-blur border-b border-white/10">
         <div className="container mx-auto px-4 py-3">
           <nav className="flex items-center gap-6">
-            <a
+            <Link
               href="/"
               className={`font-semibold tracking-tight text-sm transition-colors ${
                 excludeTeams.length ? "text-neutral-300 hover:text-white" : "text-white"
               }`}
             >
               F1.5
-            </a>
-            <a
+            </Link>
+            <Link
               href="/?excludeTeams=McLaren"
               className={`font-semibold tracking-tight text-sm transition-colors ${
                 excludeTeams.length ? "text-white" : "text-neutral-300 hover:text-white"
               }`}
             >
               Without McLaren
-            </a>
+            </Link>
           </nav>
         </div>
       </header>

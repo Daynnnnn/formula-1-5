@@ -109,7 +109,7 @@ const buildStandings = async (opts: FilterOptions = {}): Promise<DriverStanding[
   // Group results by session and recompute ranks after exclusions
   const resultsBySession = new Map<number, typeof results>();
   for (const r of results) {
-    if (!resultsBySession.has(r.sessionKey)) resultsBySession.set(r.sessionKey, [] as any);
+    if (!resultsBySession.has(r.sessionKey)) resultsBySession.set(r.sessionKey, []);
     resultsBySession.get(r.sessionKey)!.push(r);
   }
 
