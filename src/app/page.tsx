@@ -76,23 +76,23 @@ export default async function Home({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end">
           {topThree.map((d, idx) => {
             const order = idx === 0 ? 'sm:order-2' : idx === 1 ? 'sm:order-1' : 'sm:order-3';
-            const height = idx === 0 ? 'h-64 md:h-72' : idx === 1 ? 'h-56 md:h-64' : 'h-52 md:h-60';
-            const titleSize = idx === 0 ? 'text-3xl' : 'text-2xl';
+            const height = idx === 0 ? 'h-40 md:h-72' : idx === 1 ? 'h-36 md:h-64' : 'h-32 md:h-60';
+            const titleSize = idx === 0 ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl';
             return (
               <div key={d.position} className={`${order}`}>
-                <div className={`relative rounded-2xl p-6 border border-white/10 bg-gradient-to-br ${teamAccent(d.team)} shadow-xl overflow-hidden`}>
+                <div className={`relative rounded-2xl p-4 md:p-6 border border-white/10 bg-gradient-to-br ${teamAccent(d.team)} shadow-xl overflow-hidden`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-xs uppercase tracking-widest text-white/80">Position</div>
-                      <div className="text-5xl font-extrabold leading-none">{d.position}</div>
+                      <div className="text-3xl md:text-5xl font-extrabold leading-none">{d.position}</div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm text-white/80">Points</div>
-                      <div className="text-4xl font-extrabold">{d.points}</div>
+                      <div className="text-2xl md:text-4xl font-extrabold">{d.points}</div>
                     </div>
                   </div>
-                  <div className={`mt-5 ${height} flex items-end`}>
-                    <div className="w-full rounded-xl bg-black/20 backdrop-blur-sm p-5 border border-white/10">
+                  <div className={`mt-4 md:mt-5 ${height} flex items-end`}>
+                    <div className="w-full rounded-xl bg-black/20 backdrop-blur-sm p-4 md:p-5 border border-white/10">
                       <div className={`${titleSize} font-bold truncate`}>{d.driver}</div>
                       <div className="text-sm text-white/85 truncate">{d.team} • {d.nationality}</div>
                       <div className="mt-4 flex gap-3 text-xs text-white/90">
